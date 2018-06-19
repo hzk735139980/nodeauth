@@ -116,9 +116,9 @@ function(accessToken, refreshToken, profile, cb) {
   db.query("SELECT id FROM users WHERE username = ?", [profile.name.givenName], function(err, result, field){
     if (err) throw err;
     if(result.length == 0){
-        db.query("INSERT INTO users ( username, password ) values (?,?)", [profile.name.givenName, 'facebook'], function(error, result, field){
+        db.query("INSERT INTO users ( username, password ) values (?,?)", [profile.name.givenName, profile.id], function(error, result, field){
           if (error) throw error;
-          const user_id = profile.id;
+          const user_id = result.insertId;
           return cb(err, user_id);
         });
     }else{
