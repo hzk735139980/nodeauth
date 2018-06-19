@@ -6,6 +6,7 @@ var bcrypt = require('bcrypt');
 const saltRounds = 10;
 var passport  = require('passport');
 var LocalStrategy   = require('passport-local').Strategy;
+var FacebookStrategy = require('passport-facebook');
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
@@ -92,6 +93,38 @@ passport.use(new LocalStrategy(
         }
       })
     })
+}));
+router.get('/auth/facebook',
+  passport.authenticate('facebook'));
+
+router.get('/auth/facebook/callback',
+  passport.authenticate('facebook', { 
+    successRedirect: '/profile',
+    failureRedirect: '/login' 
+}));
+
+//facebook Strategy
+const FACEBOOK_APP_ID = '183535639002169';
+const FACEBOOK_APP_SECRET = '7c56b87b29bfbd6152b53bfa9f258ef3';
+passport.use(new FacebookStrategy({
+  clientID: FACEBOOK_APP_ID,
+  clientSecret: FACEBOOK_APP_SECRET,
+  callbackURL: "http://localhost:3000/auth/facebook/callback",
+  profileFields: ['id', 'name']
+},
+function(accessToken, refreshToken, profile, cb) {
+  db.query("SELECT id FROM users WHERE username = ?", [profile.name.givenName], function(err, result, field){
+    if (err) throw err;
+    if(result.length == 0){
+        db.query("INSERT INTO users ( username, password ) values (?,?)", [profile.name.givenName, 'facebook'], function(error, result, field){
+          if (error) throw error;
+          const user_id = profile.id;
+          return cb(err, user_id);
+        });
+    }else{
+      return cb(err, result[0].id);
+    }
+  });
 }));
 
 // authentication middleware
