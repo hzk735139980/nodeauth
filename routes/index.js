@@ -104,8 +104,8 @@ router.get('/auth/facebook/callback',
 }));
 
 //facebook Strategy
-const FACEBOOK_APP_ID = '';
-const FACEBOOK_APP_SECRET = '';
+const FACEBOOK_APP_ID = '183535639002169';
+const FACEBOOK_APP_SECRET = '7c56b87b29bfbd6152b53bfa9f258ef3';
 passport.use(new FacebookStrategy({
   clientID: FACEBOOK_APP_ID,
   clientSecret: FACEBOOK_APP_SECRET,
